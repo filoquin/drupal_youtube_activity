@@ -1,0 +1,171 @@
+<?php
+
+
+function youtube_activity_schema(){
+ $schema ['activities'] = array(
+  'description' => 'Activities yotutube',
+  'fields' => array(
+    'yid' => array(
+      'type' => 'serial',
+      'size' => 'normal',
+      'not null' => TRUE,
+      'description' => '',
+    ),
+    'type' => array(
+      'type' => 'varchar',
+      'size' => 'normal',
+      'length' => '40',
+      'not null' => FALSE,
+      'description' => '',
+    ),
+    'id' => array(
+      'type' => 'varchar',
+      'size' => 'normal',
+      'length' => '100',
+      'not null' => FALSE,
+      'description' => '',
+    ),
+
+    'id' => array(
+      'type' => 'varchar',
+      'size' => 'normal',
+      'length' => '100',
+      'not null' => FALSE,
+      'description' => '',
+    ),
+    'channelId' => array(
+      'type' => 'varchar',
+      'size' => 'normal',
+      'length' => '100',
+      'not null' => FALSE,
+      'description' => '',
+    ),
+    'title' => array(
+      'type' => 'varchar',
+      'size' => 'normal',
+      'length' => '255',
+      'not null' => FALSE,
+      'description' => '',
+    ),
+    'description' => array(
+      'type' => 'text',
+      'size' => 'normal',
+    ),
+    'publishedAt' => array(
+      'type' => 'int',
+      'size' => 'normal',
+      'unsigned' => FALSE,
+    ),
+    'json' => array(
+      'type' => 'text',
+      'size' => 'normal',
+    ),
+    'transaction_time' => array(
+      'type' => 'int',
+      'size' => 'normal',
+      'unsigned' => FALSE,
+    ),
+    'status' => array(
+      'type' => 'int',
+      'size' => 'tiny',
+      'unsigned' => FALSE,
+    ),
+  ),
+  'name' => 'youtube_activities',
+  'unique keys' => array(
+    'id' => array('id'),
+  ),
+
+  'indexes' => array(
+    'channelId' => array(
+      0 => 'channelId',
+    ),
+
+    'type' => array(
+      0 => 'type',
+    ),
+  ),
+  'primary key' => array(
+    0 => 'yid',
+  ),
+);
+
+return $schema;
+}
+
+/*
+$data_table->meta = array(
+  'fields' => array(
+    'yid' => array(
+      'label' => 'Id del registro',
+      'views_field_handler' => 'views_handler_field_numeric',
+      'views_filter_handler' => 'views_handler_filter_numeric',
+      'views_argument_handler' => 'views_handler_argument_numeric',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'type' => array(
+      'label' => 'type of activity',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument_string',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'id' => array(
+      'label' => 'Id youtube',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument_string',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'channelId' => array(
+      'label' => 'channelId',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument_string',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'title' => array(
+      'label' => 'title',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument_string',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'description' => array(
+      'label' => 'description',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'publishedAt' => array(
+      'label' => '',
+      'views_field_handler' => 'views_handler_field_date',
+      'views_filter_handler' => 'views_handler_filter_date',
+      'views_argument_handler' => 'views_handler_argument_date',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'json' => array(
+      'label' => 'Json Item data',
+      'views_field_handler' => 'views_handler_field',
+      'views_filter_handler' => 'views_handler_filter_string',
+      'views_argument_handler' => 'views_handler_argument',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'transaction_time' => array(
+      'label' => 'import time',
+      'views_field_handler' => 'views_handler_field_date',
+      'views_filter_handler' => 'views_handler_filter_date',
+      'views_argument_handler' => 'views_handler_argument_date',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+    'status' => array(
+      'label' => '',
+      'views_field_handler' => 'views_handler_field_numeric',
+      'views_filter_handler' => 'views_handler_filter_numeric',
+      'views_argument_handler' => 'views_handler_argument_numeric',
+      'views_sort_handler' => 'views_handler_sort',
+    ),
+  ),
+);
+*/
