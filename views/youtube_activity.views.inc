@@ -205,6 +205,9 @@ class views_handler_field_youvideo extends views_handler_field {
        '#options' => array(
             'text' => 'text',
             'player' => 'player',
+            'default' => 'thumb-> default',
+            'mqdefault' => 'thumb-> medium',
+            'hqdefault' => 'thumb -> high',
        ),
         '#default_value' => isset($this->options['view_mode']) ? $this->options['view_mode'] : 'player',
       );
@@ -249,9 +252,15 @@ class views_handler_field_youvideo extends views_handler_field {
   src="http://www.youtube.com/embed/'. $value .'?autoplay='.$this->options['autoplay'].'"  frameborder="0"/></iframe>'
 ; 
         break;
+      case 'default':
+      case 'mddefault':
+      case 'hqdefault':
+        return  "<img src=\"https://i.ytimg.com/vi/{$value}/{$element}.jpg\"  width=\"{$this->options['width']}\" height=\"{$this->options['height']}\">"; 
+        break;
+
 
       default:
-        return  "<img src=\"{$value->snippet->thumbnails->default->url}\">"; 
+        return  $value; 
         break;
     }
    }
