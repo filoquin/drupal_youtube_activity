@@ -57,7 +57,7 @@
     'title' => 'Id Youtube',
     'help' => 'string de url youtube.',
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'views_handler_field_youvideo',
       'click sortable' => FALSE,
     ),
 
