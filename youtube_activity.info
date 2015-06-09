@@ -2,3 +2,4 @@ name = Yotutube Activity
 description = inserta actividades youtube en el sitio
 core = 7.x
 
+files[] = includes/views/youtube_activity.view.inc
