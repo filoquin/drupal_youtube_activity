@@ -1,11 +1,8 @@
 <?php
 
-function youtube_activity_permission() {
+function youtube_activity_perm() {
   return array(
-    'administer youtube activity' => array(
-      'title' => t('Administer youtube activity'),
-      'description' => t('Perform administration tasks for youtube activity.'),
-    ),
+    'administer youtube activity' ,
   );
 }
 
@@ -88,21 +85,10 @@ function _get_ytb_data($data){
     $result = drupal_http_request($full_url);
     $result_set=json_decode($result->data);
     foreach ($result_set->items as $key => $item) {
-        db_merge('activities')
-      ->key(array('id' => $item->contentDetails->upload->videoId))
-      ->fields(array(
-            'id' => $item->contentDetails->upload->videoId,
-            'type' => $item->snippet->type,
-            'title' => $item->snippet->title,
-            'description' => $item->snippet->description,
-            'type' => $item->snippet->type,
-            'channelId' => $item->snippet->channelId,
-            'json' => json_encode($item),
-            'publishedAt' => strtotime($item->snippet->publishedAt),
-            'status' => 1,
-            'transaction_time' => time()
-      ))
-      ->execute();
+        db_query("INSERT IGNORE activities (id,type,title,descripcion,channelid,json,pubishedAt,status,transaction_time) 
+                  values('%s','%s','%s','%s',,'%s','%s',%f,%f,%f)",
+            $item->contentDetails->upload->videoId,$item->snippet->type, $item->snippet->title,$item->snippet->channelId,
+            json_encode($item),strtotime($item->snippet->publishedAt,1,time()));
     }
 
 
@@ -112,125 +98,65 @@ function youtube_activity_cron(){
 }
 function youtube_activity_views_api() {
   return array(
-    'api' => 3,
+    'api' => 2,
     'path' => drupal_get_path('module', 'youtube_activity') . '/views',
   );
 }
 
-function youtube_activity_views_default_views() {
+function youtube_activity_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0] = array(
+      'info' => t('Youtube Videos'),
+      'status' => 1,
+      
+    );
 
-  $view = new view();
-$view->name = 'videos';
-$view->description = '';
-$view->tag = 'default';
-$view->base_table = 'activities';
-$view->human_name = 'videos';
-$view->core = 7;
-$view->api_version = '3.0';
-$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+    return $blocks;
+  }
+  else if ($op == 'configure' && $delta == 0) {
+    $form['items'] = array(
+      '#type' => 'select',
+      '#title' => t('Number of items'),
+      '#default_value' => variable_get('youtube_activity_block_items', 5),
+      '#options' => array("0",'1', '2', '3', '4', '5', 10 =>'10', 15=>'15'),
+    );
+    return $form;
+  }
+  else if ($op == 'save' && $delta == 0) {
+    variable_set('youtube_activity_block_items', $edit['items']);
+  }
+  else if ($op == 'view') {
+    switch ($delta) {
+      case 0:
+        // Your module will need to define this function to render the block.
+        $block = array(
+          'subject' => t('Youtube'),
+          'content' => youtube_activity_display_block_1(),
+        );
+        break;
+    }
+    return $block;
+  }
 
-/* Display: Master */
-$handler = $view->new_display('default', 'Master', 'default');
-$handler->display->display_options['title'] = 'Videos';
-$handler->display->display_options['use_more_always'] = FALSE;
-$handler->display->display_options['use_more_text'] = 'más';
-$handler->display->display_options['access']['type'] = 'none';
-$handler->display->display_options['cache']['type'] = 'none';
-$handler->display->display_options['query']['type'] = 'views_query';
-$handler->display->display_options['exposed_form']['type'] = 'basic';
-$handler->display->display_options['exposed_form']['options']['submit_button'] = 'Aplicar';
-$handler->display->display_options['exposed_form']['options']['reset_button_label'] = 'Reiniciar';
-$handler->display->display_options['exposed_form']['options']['exposed_sorts_label'] = 'Ordenar por';
-$handler->display->display_options['pager']['type'] = 'some';
-$handler->display->display_options['pager']['options']['items_per_page'] = '10';
-$handler->display->display_options['style_plugin'] = 'default';
-$handler->display->display_options['row_plugin'] = 'fields';
-/* Campo: yotutube: Id Youtube */
-$handler->display->display_options['fields']['id']['id'] = 'id';
-$handler->display->display_options['fields']['id']['table'] = 'activities';
-$handler->display->display_options['fields']['id']['field'] = 'id';
-$handler->display->display_options['fields']['id']['label'] = '';
-$handler->display->display_options['fields']['id']['exclude'] = TRUE;
-$handler->display->display_options['fields']['id']['element_label_colon'] = FALSE;
-/* Campo: yotutube: Json element */
-$handler->display->display_options['fields']['json']['id'] = 'json';
-$handler->display->display_options['fields']['json']['table'] = 'activities';
-$handler->display->display_options['fields']['json']['field'] = 'json';
-$handler->display->display_options['fields']['json']['label'] = '';
-$handler->display->display_options['fields']['json']['alter']['make_link'] = TRUE;
-$handler->display->display_options['fields']['json']['alter']['path'] = 'videos/[id]';
-$handler->display->display_options['fields']['json']['element_label_colon'] = FALSE;
-/* Campo: yotutube: Titulo */
-$handler->display->display_options['fields']['title']['id'] = 'title';
-$handler->display->display_options['fields']['title']['table'] = 'activities';
-$handler->display->display_options['fields']['title']['field'] = 'title';
-$handler->display->display_options['fields']['title']['label'] = '';
-$handler->display->display_options['fields']['title']['alter']['make_link'] = TRUE;
-$handler->display->display_options['fields']['title']['alter']['path'] = 'videos/[id]';
-$handler->display->display_options['fields']['title']['element_type'] = 'strong';
-$handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-/* Criterio de ordenación: yotutube: Pubicado */
-$handler->display->display_options['sorts']['publishedAt']['id'] = 'publishedAt';
-$handler->display->display_options['sorts']['publishedAt']['table'] = 'activities';
-$handler->display->display_options['sorts']['publishedAt']['field'] = 'publishedAt';
-$handler->display->display_options['sorts']['publishedAt']['order'] = 'DESC';
+}
 
-/* Display: Block */
-$handler = $view->new_display('block', 'Block', 'block');
-$handler->display->display_options['block_description'] = 'Videos';
 
-/* Display: Página */
-$handler = $view->new_display('page', 'Página', 'page_1');
-$handler->display->display_options['defaults']['fields'] = FALSE;
-/* Campo: yotutube: Id Youtube */
-$handler->display->display_options['fields']['id']['id'] = 'id';
-$handler->display->display_options['fields']['id']['table'] = 'activities';
-$handler->display->display_options['fields']['id']['field'] = 'id';
-$handler->display->display_options['fields']['id']['label'] = '';
-$handler->display->display_options['fields']['id']['exclude'] = TRUE;
-$handler->display->display_options['fields']['id']['element_label_colon'] = FALSE;
-/* Campo: yotutube: Titulo */
-$handler->display->display_options['fields']['title']['id'] = 'title';
-$handler->display->display_options['fields']['title']['table'] = 'activities';
-$handler->display->display_options['fields']['title']['field'] = 'title';
-$handler->display->display_options['fields']['title']['label'] = '';
-$handler->display->display_options['fields']['title']['alter']['make_link'] = TRUE;
-$handler->display->display_options['fields']['title']['alter']['path'] = 'videos/[id]';
-$handler->display->display_options['fields']['title']['element_type'] = 'strong';
-$handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-/* Campo: yotutube: Json element */
-$handler->display->display_options['fields']['json']['id'] = 'json';
-$handler->display->display_options['fields']['json']['table'] = 'activities';
-$handler->display->display_options['fields']['json']['field'] = 'json';
-$handler->display->display_options['fields']['json']['label'] = '';
-$handler->display->display_options['fields']['json']['alter']['make_link'] = TRUE;
-$handler->display->display_options['fields']['json']['alter']['path'] = 'videos/[id]';
-$handler->display->display_options['fields']['json']['element_label_colon'] = FALSE;
-$handler->display->display_options['fields']['json']['element'] = 'player';
-$handler->display->display_options['defaults']['arguments'] = FALSE;
-/* Filtro contextual: yotutube: Id Youtube */
-$handler->display->display_options['arguments']['id']['id'] = 'id';
-$handler->display->display_options['arguments']['id']['table'] = 'activities';
-$handler->display->display_options['arguments']['id']['field'] = 'id';
-$handler->display->display_options['arguments']['id']['exception']['title'] = 'Todo(s)';
-$handler->display->display_options['arguments']['id']['default_argument_type'] = 'fixed';
-$handler->display->display_options['arguments']['id']['summary']['number_of_records'] = '0';
-$handler->display->display_options['arguments']['id']['summary']['format'] = 'default_summary';
-$handler->display->display_options['arguments']['id']['summary_options']['items_per_page'] = '25';
-$handler->display->display_options['arguments']['id']['limit'] = '0';
-$handler->display->display_options['path'] = 'videos/%';
-$translatables['videos'] = array(
-  t('Master'),
-  t('Videos'),
-  t('más'),
-  t('Aplicar'),
-  t('Reiniciar'),
-  t('Ordenar por'),
-  t('Asc'),
-  t('Desc'),
-  t('Block'),
-  t('Página'),
-  t('Todo(s)'),
-);
+function youtube_activity_display_block_1(){
+  $query=db_query('SELECT * from {activities} where type = "upload " limit %f order by pubishedAt desc');
+  $first=true;
+  while ($item = db_fetch_object($query)){
+    if($first){
+  
+  //    $image='<img src="http://i.ytimg.com/vi/' . $video_id .'/0.jpg" title="'.check_plain($item->title).'">';
+        $output ='<iframe id="ytplayer" type="text/html" width="247" height="160"
+    src="http://www.youtube.com/embed/'. $item->id .'?autoplay=0"  frameborder="0"/></iframe>';
+      $first=false;
+    }else {
+        $image='<img src="http://i.ytimg.com/vi/' .$item->id .'/1.jpg" width="80" title="'.check_plain($item->title).'">';
+        $output .= '<a href="javascript:" onClick="change_youtube_video(\''.$item->id.'\')">'.$image . "</a>\n";  
+    }
+  }
+  return $output;
+
 
 }
