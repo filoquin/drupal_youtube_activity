@@ -96,12 +96,13 @@ function _get_ytb_data($data){
 function youtube_activity_cron(){
   retrieve_youtube_activity();  
 }
+/*
 function youtube_activity_views_api() {
   return array(
     'api' => 2,
     'path' => drupal_get_path('module', 'youtube_activity') . '/views',
   );
-}
+}*/
 
 function youtube_activity_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'list') {
