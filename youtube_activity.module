@@ -24,7 +24,12 @@ $items["retrieve_youtube_activity"] = array(
     'access arguments' => array('administer youtube activity'),
   );
 
-
+  $items["yotutube/video/%"] = array(
+      'title' => 'Video',
+      'page callback' => 'video_page',
+      'page arguments' => array(2),
+      'access arguments' => array('access content'),
+    );
 
   return $items;
 }
@@ -114,6 +119,55 @@ function youtube_activity_views_api() {
     'path' => drupal_get_path('module', 'youtube_activity') . '/views',
   );
 }
+
+
+
+function youtube_activity_block_info() {
+  // This example comes from node.module.
+  $blocks['lastvideos'] = array(
+    'info' => t('Last videos'),
+  );
+
+
+  return $blocks;
+}
+
+
+function hook_block_view($delta = '') {
+  // This example is adapted from node.module.
+  $block = array();
+
+  switch ($delta) {
+    case 'lastvideos':
+      $block['subject'] = t('Videos');
+      $block['content'] =_list_last_videos();
+      break;
+  }
+  return $block;
+}
+
+function _list_last_videos(){
+  $query=db_query('SELECT * from {activities} where type = "upload " limit 5 order by pubishedAt desc');
+  $first=true;
+  while ($item = db_fetch_object($query)){
+
+        $image='<img src="http://i.ytimg.com/vi/' .$item->id .'/1.jpg" width="80" title="'.check_plain($item->title).'">';
+        $output .=l('yotutube/{$item->id}',$image . $item->title, array('html' => TRUE, ));
+
+  }
+  return $output;
+}
+
+
+function video_page($vid){
+  $query=db_query('SELECT * from {activities} where type = "upload " and id=":id" limit 1 order by pubishedAt desc', array(':id'=>$yid));
+  $item = db_fetch_object($query);
+  $output ='<iframe id="ytplayer" type="text/html" width="247" height="160" src="http://www.youtube.com/embed/'. $item->id .'?autoplay=0"  frameborder="0"/></iframe>';
+  drupal_set_title($item->title);
+    return $output;
+}
+
+
 
 function youtube_activity_views_default_views() {
 
