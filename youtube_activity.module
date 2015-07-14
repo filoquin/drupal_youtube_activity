@@ -65,29 +65,27 @@ function youtube_activity_form(){
 }
 function retrieve_youtube_activity(){
     $data=array('key'=> variable_get('you_api_key',''),'part'=>'snippet,id,contentDetails','maxResults'=>variable_get('you_max_retrieve_data','50'));
-    if($channel=variable_get('you_channel_id',false))$data['channelId']=$channel;
-    if(strpos($channel, ',')){
-      $channels=explode(',', $channel);
-      foreach ($channels as $channel) {
-        $data['channelId']=$channel;
-        _get_ytb_data($data);
-      }
-
-
-
-    } else {
+    $channel_id=variable_get('you_channel_id',false);
+    $channels=explode(',', $channel_id);
+    $return="";
+    foreach ($channels as $channel) {
+      $data['channelId']=$channel;
+      $return.=$channel;
       _get_ytb_data($data);
     }
 
-  
 
+  
+return $return;
 }
 
 function _get_ytb_data($data){
   $full_url = url('https://www.googleapis.com/youtube/v3/activities', array('query' => $data));
+  echo $full_url ."<br>";
     $result = drupal_http_request($full_url);
     $result_set=json_decode($result->data);
     foreach ($result_set->items as $key => $item) {
+      if(@$item->type!='upload') continue;
         db_merge('activities')
       ->key(array('id' => $item->contentDetails->upload->videoId))
       ->fields(array(
