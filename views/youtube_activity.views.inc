@@ -95,6 +95,9 @@
       'handler' => 'views_handler_field',
       'click sortable' => FALSE,
     ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
 
     'argument' => array(
       'handler' => 'views_handler_argument_string',
