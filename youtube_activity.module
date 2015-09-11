@@ -90,6 +90,7 @@ function _get_ytb_data($data){
     $result = drupal_http_request($full_url);
     $result_set=json_decode($result->data);
     foreach ($result_set->items as $key => $item) {
+      print_r($item);
       ///if(@$item->type!='upload') continue;
         db_merge('activities')
       ->key(array('id' => $item->contentDetails->upload->videoId))
